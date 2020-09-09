@@ -131,6 +131,8 @@ function MinioStorage(opts) {
     default:
       throw new TypeError('Expected opts.metadata to be undefined or function');
   }
+
+  this.preprocess = opts.preprocess;
 }
 
 MinioStorage.prototype._handleFile = function (req, file, cb) {
@@ -146,17 +148,17 @@ MinioStorage.prototype._handleFile = function (req, file, cb) {
       metaData: opts.metaData,
     };
 
-    this.minio.putObject(
+    let put = (name, stream, cb) => this.minio.putObject(
       params.bucketName,
-      params.objectName,
-      params.stream,
+      name,
+      stream,
       params.metaData,
       (err, etag) => {
         if (err) return cb(err);
 
         this.minio.getObject(
           params.bucketName,
-          params.objectName,
+          name,
           (err, dataStream) => {
             if (err) {
               return cb(err);
@@ -181,6 +183,18 @@ MinioStorage.prototype._handleFile = function (req, file, cb) {
         );
       }
     );
+
+    if (this.preprocess) {
+      let ps = Object.entries(this.preprocess).map(([suffix, process]) => new Promise(resolve => {
+        put(params.objectName + suffix, process(params.stream), resolve)
+      }))
+
+      Promise.all(ps).then(cb)
+    }
+    else {
+      put(params.objectName, params.stream)
+    }
+
   });
 };
 
