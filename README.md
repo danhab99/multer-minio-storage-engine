@@ -34,6 +34,11 @@ const upload = multer({
     objectName: function (req, file, cb) {
       cb(null, Date.now().toString());
     },
+    preprocess: {
+      '.suffix1': stream => stream,
+      '.suffix2': stream => stream,
+      '.suffix3': stream => stream,
+    }
   }),
 });
 
@@ -71,6 +76,31 @@ const opts = {
   objectName: function (req, file, cb) {
     cb(null, req.params.id + '.jpg');
   },
+};
+```
+
+## Preprocessing streams before upload
+
+The `preprocess` option is an object that includes key-value pairs for transforming the input stream into multiple individual file objects. The key is a suffix that will be appended to the object's `objectName` and the value is a function that takes the input stream and should return a stream.
+
+For example, you can use this feature in conjunction with [sharp](https://www.npmjs.com/package/sharp) to produce multiple different sizes of the uploaded image:
+
+```javascript
+const sharp = require('sharp')
+const opts = {
+  minio: minioClient,
+  bucketName: 'some-bucket',
+  metaData: function (req, file, cb) {
+    cb(null, Object.assign({}, req.body));
+  },
+  objectName: function (req, file, cb) {
+    cb(null, req.params.id + '.jpg');
+  },
+  preprocess: {
+    "(100x100)": stream => sharp(stream).resize(100, 100), // Creates an object with (100x100) at the end
+    "(200x200)": stream => sharp(stream).resize(200, 200), // for example if the object name is "upload.jpg)
+    "(300x300)": stream => sharp(stream).resize(300, 300), // we will have "upload.jpg(100x100)"
+  }
 };
 ```
 
