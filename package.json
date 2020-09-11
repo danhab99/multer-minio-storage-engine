@@ -1,5 +1,5 @@
 {
-  "name": "@danhan99/multer-minio-storage-engine",
+  "name": "@danhab99/multer-minio-storage-engine",
   "version": "1.0.0",
   "description": "Streaming multer storage engine for Minio",
   "main": "index.js",
