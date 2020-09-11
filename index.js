@@ -192,7 +192,7 @@ MinioStorage.prototype._handleFile = function (req, file, cb) {
       Promise.all(ps).then(cb)
     }
     else {
-      put(params.objectName, params.stream)
+      put(params.objectName, params.stream, cb)
     }
 
   });

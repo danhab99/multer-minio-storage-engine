@@ -1,10 +1,10 @@
 {
-  "name": "multer-minio-storage-engine",
+  "name": "@danhan99/multer-minio-storage-engine",
   "version": "1.0.0",
   "description": "Streaming multer storage engine for Minio",
   "main": "index.js",
   "scripts": {
-    "test": "standard && mocha test/basic.js"
+    "test": "mocha test/basic.js"
   },
   "repository": {
     "type": "git",
@@ -40,5 +40,8 @@
   },
   "directories": {
     "test": "test"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
